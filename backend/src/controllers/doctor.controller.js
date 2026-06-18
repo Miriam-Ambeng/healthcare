@@ -1,8 +1,25 @@
 const { validationResult } = require("express-validator");
 const User = require("../models/User");
 const Appointment = require("../models/Appointment");
-const { addMinutes, isTimeInsideSchedule } = require("../utils/time");
+const { addMinutes, hasOverlap, isTimeInsideSchedule } = require("../utils/time");
 const { translate } = require("../i18n/translator");
+
+function weekBounds(referenceDate = new Date()) {
+  const start = new Date(referenceDate);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - start.getDay());
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 7);
+
+  return { start, end };
+}
+
+function isInsideBreak(startTime, endTime, schedule) {
+  return (schedule.breaks || []).some((breakTime) =>
+    hasOverlap(startTime, endTime, breakTime.startTime, breakTime.endTime)
+  );
+}
 
 async function listDoctors(req, res, next) {
   try {
@@ -10,6 +27,41 @@ async function listDoctors(req, res, next) {
     res.json({ success: true, data: doctors });
   } catch (error) {
     next(error);
+  }
+}
+
+async function getPublicStats(req, res, next) {
+  try {
+    const { start, end } = weekBounds();
+    const [weeklyAppointments, activeSpecialists, weeklyReminderReady] = await Promise.all([
+      Appointment.countDocuments({
+        appointmentDate: { $gte: start, $lt: end },
+        status: { $in: ["pending", "confirmed", "completed"] }
+      }),
+      User.countDocuments({
+        role: "doctor",
+        "schedule.0": { $exists: true }
+      }),
+      Appointment.countDocuments({
+        appointmentDate: { $gte: start, $lt: end },
+        status: { $in: ["pending", "confirmed", "completed"] },
+        "reminderSchedule.0": { $exists: true }
+      })
+    ]);
+
+    return res.json({
+      success: true,
+      data: {
+        weeklyAppointments,
+        activeSpecialists,
+        reminderReadyPercent: weeklyAppointments
+          ? Math.round((weeklyReminderReady / weeklyAppointments) * 100)
+          : 0,
+        languagesSupported: 2
+      }
+    });
+  } catch (error) {
+    return next(error);
   }
 }
 
@@ -74,11 +126,12 @@ async function getAvailability(req, res, next) {
     while (isTimeInsideSchedule(cursor, addMinutes(cursor, daySchedule.slotDurationMinutes), daySchedule)) {
       const endTime = addMinutes(cursor, daySchedule.slotDurationMinutes);
       const booked = appointments.some((appointment) => appointment.startTime === cursor);
+      const onBreak = isInsideBreak(cursor, endTime, daySchedule);
 
       slots.push({
         startTime: cursor,
         endTime,
-        available: !booked
+        available: !booked && !onBreak
       });
 
       cursor = endTime;
@@ -92,6 +145,7 @@ async function getAvailability(req, res, next) {
 
 module.exports = {
   listDoctors,
+  getPublicStats,
   updateMySchedule,
   getAvailability
 };

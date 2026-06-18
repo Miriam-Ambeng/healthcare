@@ -19,19 +19,28 @@ const scheduleSchema = new mongoose.Schema(
       required: true,
       match: /^([01]\d|2[0-3]):([0-5]\d)$/
     },
-    breakStartTime: {
-      type: String,
-      match: /^([01]\d|2[0-3]):([0-5]\d)$/
-    },
-    breakEndTime: {
-      type: String,
-      match: /^([01]\d|2[0-3]):([0-5]\d)$/
-    },
     slotDurationMinutes: {
       type: Number,
       default: 30,
       min: 10,
       max: 240
+    },
+    breaks: {
+      type: [
+        {
+          startTime: {
+            type: String,
+            required: true,
+            match: /^([01]\d|2[0-3]):([0-5]\d)$/
+          },
+          endTime: {
+            type: String,
+            required: true,
+            match: /^([01]\d|2[0-3]):([0-5]\d)$/
+          }
+        }
+      ],
+      default: []
     }
   },
   { _id: false }

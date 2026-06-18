@@ -1138,6 +1138,23 @@ button {
   margin-bottom: 8px;
 }
 
+.break-time-panel {
+  background: #f8fbff;
+  border: 1px solid #dce4ef;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 16px;
+}
+
+.break-time-panel legend {
+  color: #243653;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 0 6px;
+}
+
 .day-picker {
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }

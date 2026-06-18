@@ -8,8 +8,6 @@ const {
   sendAppointmentStatusUpdate
 } = require("../services/email.service");
 
-const PAID_REMINDER_FEE = 25;
-
 function normalizeReminderSchedule(reminders) {
   if (!Array.isArray(reminders) || reminders.length === 0) {
     return [];
@@ -20,14 +18,6 @@ function normalizeReminderSchedule(reminders) {
     sendAt: new Date(reminder.sendAt),
     status: "pending"
   }));
-}
-
-function calculateReminderFee(reminders) {
-  if (!Array.isArray(reminders)) {
-    return 0;
-  }
-
-  return reminders.filter((reminder) => reminder.method !== "email").length * PAID_REMINDER_FEE;
 }
 
 function normalizeMedicalReport(report) {
@@ -55,6 +45,12 @@ function appointmentStartDateTime(appointment) {
   return new Date(`${dateText}T${appointment.startTime}:00`);
 }
 
+function isInsideBreak(startTime, endTime, schedule) {
+  return (schedule.breaks || []).some((breakTime) =>
+    hasOverlap(startTime, endTime, breakTime.startTime, breakTime.endTime)
+  );
+}
+
 async function validateSlot({ doctor, appointmentDate, startTime, slotDurationMinutes }) {
   const schedule = doctor.schedule.find((item) => item.dayOfWeek === appointmentDate.getDay());
 
@@ -65,6 +61,10 @@ async function validateSlot({ doctor, appointmentDate, startTime, slotDurationMi
   const endTime = addMinutes(startTime, slotDurationMinutes || schedule.slotDurationMinutes);
 
   if (!isTimeInsideSchedule(startTime, endTime, schedule)) {
+    return { valid: false, reason: "doctorUnavailable" };
+  }
+
+  if (isInsideBreak(startTime, endTime, schedule)) {
     return { valid: false, reason: "doctorUnavailable" };
   }
 
@@ -126,7 +126,6 @@ async function createAppointment(req, res, next) {
       reason: req.body.reason || "Consultation",
       previousMedicalReport: normalizeMedicalReport(req.body.previousMedicalReport),
       reminderSchedule: normalizeReminderSchedule(req.body.reminderSchedule),
-      reminderFeeTotal: calculateReminderFee(req.body.reminderSchedule),
       status: "confirmed"
     });
 

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ArrowLeft,
@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import "./styles.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "http://localhost:5000/api" : "/api")).replace(/\/$/, "");
 const SPECIALTIES = ["All", "Cardiology", "Pediatrics", "Dermatology", "Dentistry", "Neurology", "Orthopedics", "Gynecology"];
 const DOCTOR_SPECIALTIES = ["Cardiology", "Pediatrics", "Dermatology", "Dentistry", "Neurology", "Orthopedics", "Gynecology"];
 const LANGUAGES = [
@@ -31,9 +31,9 @@ const LANGUAGES = [
 const TEXT = {
   en: {
     getStarted: "Get Started",
-    footerNote: "Regional Hospital Buea, Cameroon",
-    welcomeTitle: "Regional Hospital Buea",
-    welcomeSubtitle: "Book appointments, manage clinic schedules, and receive care reminders from one trusted hospital portal.",
+    footerNote: "Book Safe, Cameroon",
+    welcomeTitle: "Book Safe",
+    welcomeSubtitle: "Book appointments, manage clinic schedules, and receive care reminders from one trusted health portal.",
     welcomeBack: "Welcome Back",
     signInContinue: "Sign in to continue",
     email: "Email",
@@ -145,15 +145,18 @@ const TEXT = {
     workingDays: "Working Days",
     start: "Start",
     end: "End",
+    breakTime: "Break Time",
+    breakStart: "Break Start",
+    breakEnd: "Break End",
     slotMinutes: "Slot Minutes",
     saveSchedule: "Save Schedule",
     viewAppointments: "View Appointments"
   },
   fr: {
     getStarted: "Commencer",
-    footerNote: "Hopital Regional de Buea, Cameroun",
-    welcomeTitle: "Hopital Regional de Buea",
-    welcomeSubtitle: "Prenez rendez-vous, gerez les horaires de clinique et recevez des rappels depuis un portail hospitalier fiable.",
+    footerNote: "Book Safe, Cameroun",
+    welcomeTitle: "Book Safe",
+    welcomeSubtitle: "Prenez rendez-vous, gerez les horaires de clinique et recevez des rappels depuis un portail de sante fiable.",
     welcomeBack: "Bon Retour",
     signInContinue: "Connectez-vous pour continuer",
     email: "Email",
@@ -265,6 +268,9 @@ const TEXT = {
     workingDays: "Jours de Travail",
     start: "Debut",
     end: "Fin",
+    breakTime: "Pause",
+    breakStart: "Debut de Pause",
+    breakEnd: "Fin de Pause",
     slotMinutes: "Minutes par Creneau",
     saveSchedule: "Enregistrer le Planning",
     viewAppointments: "Voir les Rendez-vous"
@@ -422,7 +428,7 @@ function App() {
           />
           {notice && <Toast message={notice} />}
 
-          {screen === "welcome" && <WelcomePage goLogin={() => setScreen("login")} t={t} language={language} setLanguage={setLanguage} />}
+          {screen === "welcome" && <WelcomePage api={api} goLogin={() => setScreen("login")} t={t} language={language} setLanguage={setLanguage} />}
           {screen === "login" && <LoginPage api={api} saveSession={saveSession} goBack={() => setScreen("welcome")} goSignup={() => setScreen("signup")} showNotice={showNotice} t={t} />}
           {screen === "signup" && <SignupPage api={api} saveSession={saveSession} goBack={() => setScreen("login")} showNotice={showNotice} language={language} setLanguage={setLanguage} t={t} />}
           {screen === "doctors" && (
@@ -507,7 +513,7 @@ function SiteHeader({ screen, user, language, setLanguage, t, goHome, goDoctorHo
         <button className="brand-button" type="button" onClick={goHome}>
           <span className="brand-icon"><Heart size={20} fill="currentColor" /></span>
           <span>
-            <strong>Regional Hospital Buea</strong>
+            <strong>Book Safe</strong>
             <small>Appointment Portal</small>
           </span>
         </button>
@@ -545,8 +551,8 @@ function SiteFooter() {
   return (
     <footer className="site-footer">
       <div>
-        <strong>Regional Hospital Buea</strong>
-        <span>Automated hospital appointment system for Buea, Cameroon</span>
+        <strong>Book Safe</strong>
+        <span>Automated healthcare appointment system for Cameroon</span>
       </div>
       <div>
         <span>Email reminders</span>
@@ -573,7 +579,7 @@ function BackButton({ onClick }) {
   );
 }
 
-function WelcomePage({ goLogin, t }) {
+function WelcomePage({ api, goLogin, t }) {
   const heroSlides = [
     {
       title: "Cardiology clinic",
@@ -618,6 +624,12 @@ function WelcomePage({ goLogin, t }) {
   ];
   const [activeSlide, setActiveSlide] = useState(0);
   const [activeImage, setActiveImage] = useState(0);
+  const [stats, setStats] = useState({
+    weeklyAppointments: 0,
+    activeSpecialists: 0,
+    reminderReadyPercent: 0,
+    languagesSupported: LANGUAGES.length
+  });
   const activeHero = heroSlides[activeSlide];
   const activeWaitingImage = waitingImages[activeImage];
   const ActiveHeroIcon = activeHero.icon;
@@ -636,13 +648,24 @@ function WelcomePage({ goLogin, t }) {
     return () => window.clearInterval(timer);
   }, [waitingImages.length]);
 
+  useEffect(() => {
+    api.request("/doctors/public/stats")
+      .then((result) => setStats({
+        weeklyAppointments: result.data.weeklyAppointments ?? 0,
+        activeSpecialists: result.data.activeSpecialists ?? 0,
+        reminderReadyPercent: result.data.reminderReadyPercent ?? 0,
+        languagesSupported: result.data.languagesSupported ?? LANGUAGES.length
+      }))
+      .catch(() => {});
+  }, [api]);
+
   return (
     <section className="page welcome-page">
       <div className="home-hero-shell">
       <div className="hero-pulse one" />
       <div className="hero-pulse two" />
       <div className="welcome-copy">
-        <p className="hospital-kicker">Regional Hospital Buea, Cameroon</p>
+        <p className="hospital-kicker">Book Safe, Cameroon</p>
         <div className="brand-mark">
           <Heart size={54} fill="white" />
         </div>
@@ -665,7 +688,7 @@ function WelcomePage({ goLogin, t }) {
           <button className="primary-action" type="button" onClick={goLogin}>
             {t("getStarted")}
           </button>
-          <a className="secondary-action" href="#hospital-services">View hospital services</a>
+          <a className="secondary-action" href="#hospital-services">View health services</a>
         </div>
         <div className="hero-trust-grid" aria-label="Hospital appointment highlights">
           <span><strong>24/7</strong> Online booking access</span>
@@ -673,7 +696,7 @@ function WelcomePage({ goLogin, t }) {
           <span><strong>+237</strong> Cameroon phone support</span>
         </div>
       </div>
-      <aside className="hero-image-panel" aria-label="Regional Hospital Buea care team">
+      <aside className="hero-image-panel" aria-label="Book Safe care team">
         <div className="hero-shape shape-one" />
         <div className="hero-shape shape-two" />
         <img key={activeWaitingImage.src} src={activeWaitingImage.src} alt={activeWaitingImage.title} />
@@ -695,19 +718,19 @@ function WelcomePage({ goLogin, t }) {
       </div>
       <div className="home-dashboard-strip">
         <article>
-          <strong>126</strong>
+          <strong>{stats.weeklyAppointments}</strong>
           <span>Appointments coordinated this week</span>
         </article>
         <article>
-          <strong>18</strong>
+          <strong>{stats.activeSpecialists}</strong>
           <span>Specialists managing schedules</span>
         </article>
         <article>
-          <strong>94%</strong>
+          <strong>{stats.reminderReadyPercent}%</strong>
           <span>Reminder-ready bookings</span>
         </article>
         <article>
-          <strong>2</strong>
+          <strong>{stats.languagesSupported}</strong>
           <span>Languages supported</span>
         </article>
       </div>
@@ -920,7 +943,7 @@ function DoctorsPage({ api, user, signOut, openAppointments, chooseDoctor, showN
       <header className="blue-header">
         <div className="header-row">
           <div>
-            <p className="section-kicker">Regional Hospital Buea</p>
+            <p className="section-kicker">Book Safe</p>
             <h1>{t("findDoctor")}</h1>
           </div>
           <button className="icon-button light" type="button" onClick={openAppointments}><Menu size={30} /></button>
@@ -954,7 +977,7 @@ function DoctorsPage({ api, user, signOut, openAppointments, chooseDoctor, showN
 function DoctorCard({ doctor, onBook, t }) {
   return (
     <article className="doctor-card">
-      <div className="doctor-avatar"><User size={42} aria-hidden="true" /></div>
+      <div className="doctor-avatar">{doctor.name?.includes("Michael") ? "👨‍⚕️" : "👩‍⚕️"}</div>
       <div className="doctor-info">
         <h2>Dr. {doctor.name}</h2>
         <p>{doctor.specialization || "Specialist"}</p>
@@ -962,7 +985,7 @@ function DoctorCard({ doctor, onBook, t }) {
           <span><Star size={18} fill="#f5b400" /> 4.8 (124)</span>
           <span><Clock3 size={17} /> 12 years</span>
         </div>
-        <span className="location"><MapPin size={17} /> Regional Hospital Buea</span>
+        <span className="location"><MapPin size={17} /> Book Safe</span>
       </div>
       <button className="book-button" type="button" onClick={onBook}>{t("book")}</button>
     </article>
@@ -1245,7 +1268,7 @@ function ReminderPage({ api, booking, goBack, confirm, openPayment, t, showNotic
         </div>
         <div className="preference-box">
           <span>{t("preferences")}</span>
-          <strong>{reminderCount} reminder{reminderCount > 1 ? "s" : ""} - {selectedMethodLabel}</strong>
+          <strong>{reminderCount} reminder{reminderCount > 1 ? "s" : ""} • {selectedMethodLabel}</strong>
         </div>
         <button className="primary-action" type="button" disabled={loading} onClick={createAppointment}>{loading ? t("creating") : t("continueConfirmation")}</button>
       </div>
@@ -1353,7 +1376,7 @@ function ConfirmationPage({ booking, backHome, t }) {
       <p>{t("confirmedSubtitle")}</p>
       <article className="receipt-card">
         <div className="receipt-doctor">
-          <div className="doctor-avatar small"><User size={24} aria-hidden="true" /></div>
+          <div className="doctor-avatar small">👩‍⚕️</div>
           <div>
             <h2>Dr. {booking.doctor.name}</h2>
             <span>{booking.doctor.specialization || "Doctor"}</span>
@@ -1362,7 +1385,7 @@ function ConfirmationPage({ booking, backHome, t }) {
         <div className="receipt-lines">
           <span><CalendarDays size={21} /> {longDate}</span>
           <span><Clock3 size={21} /> {toDisplayTime(booking.startTime)} - {toDisplayTime(booking.endTime)}</span>
-          <span><MapPin size={21} /> Regional Hospital Buea</span>
+          <span><MapPin size={21} /> Book Safe</span>
           {booking.previousMedicalReport?.fileName && <span><FileText size={21} /> {booking.previousMedicalReport.fileName}</span>}
         </div>
         {booking.previousMedicalReport?.details && (
@@ -1437,7 +1460,7 @@ function AppointmentsPage({ api, user, goBack, showNotice, t }) {
             <article className="appointment-card" key={appointment._id}>
               <div>
                 <h2>{isDoctorView ? appointment.patient?.name || "Client" : `Dr. ${appointment.doctor?.name}`}</h2>
-                <p>{appointment.appointmentDate?.slice(0, 10)} - {appointment.startTime} - {appointment.endTime}</p>
+                <p>{appointment.appointmentDate?.slice(0, 10)} • {appointment.startTime} - {appointment.endTime}</p>
                 <span>{appointment.reason || "Consultation"}</span>
                 {appointment.previousMedicalReport?.fileName && <span>{t("previousMedicalReport")}: {appointment.previousMedicalReport.fileName}</span>}
                 {appointment.previousMedicalReport?.details && (
@@ -1508,6 +1531,7 @@ function AppointmentsPage({ api, user, goBack, showNotice, t }) {
 function DoctorHome({ api, user, signOut, openAppointments, showNotice, t }) {
   const [selectedDays, setSelectedDays] = useState(["1", "3", "5"]);
   const [schedule, setSchedule] = useState({ startTime: "09:00", endTime: "15:00", slotDurationMinutes: "30" });
+  const [breakTime, setBreakTime] = useState({ startTime: "12:00", endTime: "13:00" });
   const [specialization, setSpecialization] = useState(user?.specialization || "Cardiology");
 
   async function saveSchedule() {
@@ -1524,7 +1548,8 @@ function DoctorHome({ api, user, signOut, openAppointments, showNotice, t }) {
           schedule: selectedDays.map((dayOfWeek) => ({
             ...schedule,
             dayOfWeek: Number(dayOfWeek),
-            slotDurationMinutes: Number(schedule.slotDurationMinutes)
+            slotDurationMinutes: Number(schedule.slotDurationMinutes),
+            breaks: breakTime.startTime && breakTime.endTime ? [breakTime] : []
           }))
         })
       });
@@ -1578,6 +1603,13 @@ function DoctorHome({ api, user, signOut, openAppointments, showNotice, t }) {
           <InputField label={t("start")} icon={<Clock3 />} value={schedule.startTime} onChange={(value) => setSchedule({ ...schedule, startTime: value })} type="time" />
           <InputField label={t("end")} icon={<Clock3 />} value={schedule.endTime} onChange={(value) => setSchedule({ ...schedule, endTime: value })} type="time" />
         </div>
+        <fieldset className="break-time-panel">
+          <legend>{t("breakTime")}</legend>
+          <div className="split-row">
+            <InputField label={t("breakStart")} icon={<Clock3 />} value={breakTime.startTime} onChange={(value) => setBreakTime({ ...breakTime, startTime: value })} type="time" />
+            <InputField label={t("breakEnd")} icon={<Clock3 />} value={breakTime.endTime} onChange={(value) => setBreakTime({ ...breakTime, endTime: value })} type="time" />
+          </div>
+        </fieldset>
         <InputField label={t("slotMinutes")} icon={<CalendarDays />} value={schedule.slotDurationMinutes} onChange={(value) => setSchedule({ ...schedule, slotDurationMinutes: value })} type="number" />
         <button className="primary-action" type="button" onClick={saveSchedule}>{t("saveSchedule")}</button>
         <button className="outline-action" type="button" onClick={openAppointments}>{t("viewAppointments")}</button>
@@ -1602,5 +1634,3 @@ function toDisplayTime(time) {
 }
 
 createRoot(document.getElementById("root")).render(<App />);
-
-
