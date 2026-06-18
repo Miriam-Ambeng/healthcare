@@ -954,7 +954,7 @@ function DoctorsPage({ api, user, signOut, openAppointments, chooseDoctor, showN
 function DoctorCard({ doctor, onBook, t }) {
   return (
     <article className="doctor-card">
-      <div className="doctor-avatar">{doctor.name?.includes("Michael") ? "ðŸ‘¨â€âš•ï¸" : "ðŸ‘©â€âš•ï¸"}</div>
+      <div className="doctor-avatar"><User size={42} aria-hidden="true" /></div>
       <div className="doctor-info">
         <h2>Dr. {doctor.name}</h2>
         <p>{doctor.specialization || "Specialist"}</p>
@@ -1245,7 +1245,7 @@ function ReminderPage({ api, booking, goBack, confirm, openPayment, t, showNotic
         </div>
         <div className="preference-box">
           <span>{t("preferences")}</span>
-          <strong>{reminderCount} reminder{reminderCount > 1 ? "s" : ""} â€¢ {selectedMethodLabel}</strong>
+          <strong>{reminderCount} reminder{reminderCount > 1 ? "s" : ""} - {selectedMethodLabel}</strong>
         </div>
         <button className="primary-action" type="button" disabled={loading} onClick={createAppointment}>{loading ? t("creating") : t("continueConfirmation")}</button>
       </div>
@@ -1353,7 +1353,7 @@ function ConfirmationPage({ booking, backHome, t }) {
       <p>{t("confirmedSubtitle")}</p>
       <article className="receipt-card">
         <div className="receipt-doctor">
-          <div className="doctor-avatar small">ðŸ‘©â€âš•ï¸</div>
+          <div className="doctor-avatar small"><User size={24} aria-hidden="true" /></div>
           <div>
             <h2>Dr. {booking.doctor.name}</h2>
             <span>{booking.doctor.specialization || "Doctor"}</span>
@@ -1437,7 +1437,7 @@ function AppointmentsPage({ api, user, goBack, showNotice, t }) {
             <article className="appointment-card" key={appointment._id}>
               <div>
                 <h2>{isDoctorView ? appointment.patient?.name || "Client" : `Dr. ${appointment.doctor?.name}`}</h2>
-                <p>{appointment.appointmentDate?.slice(0, 10)} â€¢ {appointment.startTime} - {appointment.endTime}</p>
+                <p>{appointment.appointmentDate?.slice(0, 10)} - {appointment.startTime} - {appointment.endTime}</p>
                 <span>{appointment.reason || "Consultation"}</span>
                 {appointment.previousMedicalReport?.fileName && <span>{t("previousMedicalReport")}: {appointment.previousMedicalReport.fileName}</span>}
                 {appointment.previousMedicalReport?.details && (
@@ -1602,4 +1602,5 @@ function toDisplayTime(time) {
 }
 
 createRoot(document.getElementById("root")).render(<App />);
+
 
