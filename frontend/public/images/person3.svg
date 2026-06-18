@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="100%" height="100%" fill="#f6fff4"/>
+  <g transform="translate(120,120)">
+    <rect x="80" y="40" width="320" height="520" rx="20" fill="#dff3e6" />
+    <circle cx="240" cy="160" r="72" fill="#0f4c81" />
+    <rect x="420" y="160" width="520" height="300" rx="18" fill="#fff" />
+    <rect x="460" y="220" width="420" height="22" rx="10" fill="#bfe6c7" />
+    <rect x="460" y="260" width="320" height="18" rx="8" fill="#e6f7ea" />
+  </g>
+  <text x="48" y="760" fill="#1b5e20" font-size="28" font-family="Arial, Helvetica, sans-serif">Patient waiting - 3</text>
+</svg>

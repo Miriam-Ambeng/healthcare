@@ -1,0 +1,35 @@
+{
+  "name": "automated-healthcare-appointment-system",
+  "version": "1.0.0",
+  "description": "Node.js backend for an automated health care appointment system.",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "send-reminders": "node src/jobs/sendReminders.js",
+    "test-notification": "node src/jobs/testNotification.js"
+  },
+  "keywords": [
+    "healthcare",
+    "appointments",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "nodemailer": "^8.0.7",
+    "twilio": "^4.15.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

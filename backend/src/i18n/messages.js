@@ -1,0 +1,53 @@
+module.exports = {
+  en: {
+    authRequired: "Authentication is required.",
+    forbidden: "You are not allowed to perform this action.",
+    notFound: "Resource not found.",
+    serverError: "Something went wrong.",
+    duplicateResource: "This record already exists.",
+    registerSuccess: "Registration successful.",
+    loginSuccess: "Login successful.",
+    invalidCredentials: "Invalid email or password.",
+    appointmentBooked: "Appointment booked successfully.",
+    appointmentCancelled: "Appointment cancelled successfully.",
+    cancelWindowClosed: "Appointments can only be cancelled at least 24 hours before the appointment time.",
+    appointmentUpdated: "Appointment updated successfully.",
+    doctorUnavailable: "Doctor is not available at this time.",
+    slotAlreadyBooked: "This time slot has already been booked.",
+    scheduleUpdated: "Schedule updated successfully."
+  },
+  fr: {
+    authRequired: "Authentification requise.",
+    forbidden: "Vous n'etes pas autorise a effectuer cette action.",
+    notFound: "Ressource introuvable.",
+    serverError: "Une erreur s'est produite.",
+    duplicateResource: "Cet enregistrement existe deja.",
+    registerSuccess: "Inscription reussie.",
+    loginSuccess: "Connexion reussie.",
+    invalidCredentials: "Email ou mot de passe invalide.",
+    appointmentBooked: "Rendez-vous reserve avec succes.",
+    appointmentCancelled: "Rendez-vous annule avec succes.",
+    cancelWindowClosed: "Les rendez-vous ne peuvent etre annules qu'au moins 24 heures avant l'heure du rendez-vous.",
+    appointmentUpdated: "Rendez-vous mis a jour avec succes.",
+    doctorUnavailable: "Le medecin n'est pas disponible a cette heure.",
+    slotAlreadyBooked: "Ce creneau horaire est deja reserve.",
+    scheduleUpdated: "Horaire mis a jour avec succes."
+  },
+  yo: {
+    authRequired: "A nilo ki o wole.",
+    forbidden: "O ko ni aṣẹ lati se ise yi.",
+    notFound: "A ko ri ohun ti o wa.",
+    serverError: "Nkan kan lo buru.",
+    duplicateResource: "Igbasilẹ yi ti wa tele.",
+    registerSuccess: "Iforukosile se aseyori.",
+    loginSuccess: "Wiwole se aseyori.",
+    invalidCredentials: "Imeeli tabi oroigbaniwole ko pe.",
+    appointmentBooked: "Ipade dokita ti wa ni iwe pelu aseyori.",
+    appointmentCancelled: "Ipade dokita ti fagile pelu aseyori.",
+    cancelWindowClosed: "O le fagile ipade dokita nikan ti wakati 24 tabi ju bee lo ku si akoko ipade.",
+    appointmentUpdated: "Ipade dokita ti ni imudojuiwon pelu aseyori.",
+    doctorUnavailable: "Dokita ko si ni akoko yi.",
+    slotAlreadyBooked: "Akoko yi ti gba tele.",
+    scheduleUpdated: "Eto akoko ti ni imudojuiwon pelu aseyori."
+  }
+};
